@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_simtools/batal_alih_rawat_page.dart';
 import 'package:flutter_simtools/catatan_medis_double_page.dart';
 import 'package:flutter_simtools/pasien_all_hari_ini_page.dart';
 import 'main.dart'; // Pastikan ini import AppThemeMode
@@ -18,7 +19,7 @@ final menuList = [
     'title': 'Rawat Jalan',
     'icon': Icons.home,
     'items': [
-      {'label': 'Batal Alih Rawat', 'widget': menuPage('Batal Alih Rawat')},
+      {'label': 'Batal Alih Rawat', 'widget': const BatalAlihRawatPage()},
       {
         'label': 'Catatan Medis Double',
         'widget': const CatatanMedisDoublePage(),
@@ -241,34 +242,42 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             // FOOTER: tombol logout di bawah sendiri
-            Padding(
-              padding: const EdgeInsets.only(
+            SafeArea(
+              minimum: const EdgeInsets.only(
                 bottom: 12,
                 left: 8,
                 right: 8,
                 top: 6,
               ),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.logout),
-                  label: const Text("Logout"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[400],
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 12,
+                  left: 8,
+                  right: 8,
+                  top: 6,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.logout),
+                    label: const Text("Logout"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[400],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    onPressed: () {
+                      // Kembali ke LoginPage dan hapus seluruh navigation stack
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                        (route) => false,
+                      );
+                    },
                   ),
-                  onPressed: () {
-                    // Kembali ke LoginPage dan hapus seluruh navigation stack
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginPage()),
-                      (route) => false,
-                    );
-                  },
                 ),
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/pasien_service.dart';
 
 class PasienAllHariIniPage extends StatefulWidget {
   const PasienAllHariIniPage({super.key});
@@ -15,38 +16,11 @@ class _PasienAllHariIniPageState extends State<PasienAllHariIniPage> {
   bool _onlyUnverified = false;
   bool _onlyKonsul = false;
 
-  // Dummy data pasien
-  final List<Map<String, dynamic>> pasien = [
-    {
-      'registrasiId': 10001,
-      'namaPasien': 'Andi Wijaya',
-      'noAntrianKlinik': 1,
-      'namaPembayaran': 'BPJS',
-      'ruangId': 'RJ01',
-      'ruangDeskripsi': 'Poli Penyakit Dalam',
-      'namaDPJP': 'Dr. Siti',
-      'anamnesa': true,
-      'verified': true,
-      'fastTrack': false,
-      'ruangKonsul': null,
-    },
-    {
-      'registrasiId': 10002,
-      'namaPasien': 'Budi Santoso',
-      'noAntrianKlinik': 2,
-      'namaPembayaran': 'Umum',
-      'ruangId': 'RJ02',
-      'ruangDeskripsi': 'Poli Anak',
-      'namaDPJP': 'Dr. John',
-      'anamnesa': true,
-      'verified': false,
-      'fastTrack': true,
-      'ruangKonsul': 'RJ02',
-    },
-    // Tambah data dummy lain sesuai kebutuhan
-  ];
+  List<Map<String, dynamic>> pasien = [];
+  bool loading = false;
+  String error = '';
 
-  // --- Filter logic mirip React ---
+  // --- Filter logic mirip React, tapi pakai data dari API
   List<Map<String, dynamic>> get filteredPasien {
     var result = pasien
         .where((item) {
@@ -84,14 +58,43 @@ class _PasienAllHariIniPageState extends State<PasienAllHariIniPage> {
       _searchRuang = '';
       _onlyUnverified = false;
       _onlyKonsul = false;
-      // TODO: Clear pasien jika perlu
     });
+  }
+
+  Future<void> loadPasienAllHariIni() async {
+    setState(() {
+      loading = true;
+      error = '';
+    });
+    try {
+      final user = await getUserName() ?? '';
+      final data = await getPasienByUser(
+        user: user,
+        rs: _rs,
+        // searchKey bisa tambahkan jika ingin pencarian via backend
+      );
+      setState(() {
+        pasien = data;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+      });
+    }
+    setState(() {
+      loading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadPasienAllHariIni();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Pasien Hari Ini"),
@@ -99,12 +102,7 @@ class _PasienAllHariIniPageState extends State<PasienAllHariIniPage> {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: "Refresh Data",
-            onPressed: () {
-              // TODO: Panggil API, sekarang dummy
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text("Data di-refresh!")));
-            },
+            onPressed: loadPasienAllHariIni,
           ),
         ],
       ),
@@ -121,19 +119,28 @@ class _PasienAllHariIniPageState extends State<PasienAllHariIniPage> {
                     ChoiceChip(
                       label: const Text("RSMS"),
                       selected: _rs == 'RSMS',
-                      onSelected: (_) => setState(() => _rs = 'RSMS'),
+                      onSelected: (_) {
+                        setState(() => _rs = 'RSMS');
+                        loadPasienAllHariIni();
+                      },
                     ),
                     const SizedBox(width: 4),
                     ChoiceChip(
                       label: const Text("Abiyasa"),
                       selected: _rs == 'ABIYASA',
-                      onSelected: (_) => setState(() => _rs = 'ABIYASA'),
+                      onSelected: (_) {
+                        setState(() => _rs = 'ABIYASA');
+                        loadPasienAllHariIni();
+                      },
                     ),
                     const SizedBox(width: 4),
                     ChoiceChip(
                       label: const Text("Semua"),
                       selected: _rs == '%20',
-                      onSelected: (_) => setState(() => _rs = '%20'),
+                      onSelected: (_) {
+                        setState(() => _rs = '%20');
+                        loadPasienAllHariIni();
+                      },
                     ),
                     const SizedBox(width: 8),
                     OutlinedButton.icon(
@@ -256,98 +263,108 @@ class _PasienAllHariIniPageState extends State<PasienAllHariIniPage> {
             ),
             // DAFTAR PASIEN
             Expanded(
-              child: filteredPasien.isEmpty
+              child: loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : error.isNotEmpty
                   ? Center(
                       child: Text(
-                        "Tidak ada pasien ditemukan.",
-                        style: TextStyle(color: theme.hintColor),
+                        error,
+                        style: const TextStyle(color: Colors.red),
                       ),
                     )
-                  : ListView.separated(
-                      itemCount: filteredPasien.length,
-                      separatorBuilder: (_, __) => Divider(height: 1),
-                      itemBuilder: (context, i) {
-                        final p = filteredPasien[i];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 6,
-                          ),
-                          elevation: 1,
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: p['fastTrack']
-                                  ? Colors.red[200]
-                                  : (p['verified']
-                                        ? Colors.blue[100]
-                                        : (p['anamnesa']
-                                              ? Colors.yellow[100]
-                                              : Colors.grey[300])),
-                              child: Text(
-                                "${p['noAntrianKlinik']}",
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                  : (filteredPasien.isEmpty
+                        ? Center(
+                            child: Text(
+                              "Tidak ada pasien ditemukan.",
+                              style: TextStyle(color: theme.hintColor),
                             ),
-                            title: Text(
-                              p['namaPasien'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.confirmation_number,
-                                      size: 14,
-                                      color: theme.primaryColor,
-                                    ),
-                                    const SizedBox(width: 2),
-                                    Text("Reg: ${p['registrasiId']}"),
-                                    const SizedBox(width: 8),
-                                    Icon(
-                                      Icons.local_hospital,
-                                      size: 14,
-                                      color: theme.primaryColor,
-                                    ),
-                                    const SizedBox(width: 2),
-                                    Text(p['ruangDeskripsi']),
-                                  ],
+                          )
+                        : ListView.separated(
+                            itemCount: filteredPasien.length,
+                            separatorBuilder: (_, __) => Divider(height: 1),
+                            itemBuilder: (context, i) {
+                              final p = filteredPasien[i];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 6,
                                 ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.payment,
-                                      size: 14,
-                                      color: theme.primaryColor,
+                                elevation: 1,
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: p['fastTrack']
+                                        ? Colors.red[200]
+                                        : (p['verified']
+                                              ? Colors.blue[100]
+                                              : (p['anamnesa']
+                                                    ? Colors.yellow[100]
+                                                    : Colors.grey[300])),
+                                    child: Text(
+                                      "${p['noAntrianKlinik']}",
+                                      style: const TextStyle(
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    const SizedBox(width: 2),
-                                    Text(p['namaPembayaran']),
-                                    const SizedBox(width: 8),
-                                    Icon(
-                                      Icons.person_outline,
-                                      size: 14,
-                                      color: theme.primaryColor,
+                                  ),
+                                  title: Text(
+                                    p['namaPasien'],
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
                                     ),
-                                    const SizedBox(width: 2),
-                                    Text(p['namaDPJP']),
-                                  ],
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.confirmation_number,
+                                            size: 14,
+                                            color: theme.primaryColor,
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Text("Reg: ${p['registrasiId']}"),
+                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.local_hospital,
+                                            size: 14,
+                                            color: theme.primaryColor,
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Text(p['ruangDeskripsi']),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.payment,
+                                            size: 14,
+                                            color: theme.primaryColor,
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Text(p['namaPembayaran']),
+                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.person_outline,
+                                            size: 14,
+                                            color: theme.primaryColor,
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Text(p['namaDPJP']),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: _statusChip(p),
+                                  isThreeLine: true,
                                 ),
-                              ],
-                            ),
-                            trailing: _statusChip(p),
-                            isThreeLine: true,
-                          ),
-                        );
-                      },
-                    ),
+                              );
+                            },
+                          )),
             ),
           ],
         ),

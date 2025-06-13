@@ -78,7 +78,11 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+          'userName',
+          nama,
+        ); // username sesuai input login user
         // Cek key token, sesuaikan dengan struktur API
         var token = responseData['token'];
         if (token == null && responseData['result'] != null) {
