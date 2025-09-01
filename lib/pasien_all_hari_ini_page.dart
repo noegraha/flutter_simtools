@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Tambahkan import ini untuk Clipboard
 import '../services/pasien_service.dart';
 
 class PasienAllHariIniPage extends StatefulWidget {
@@ -59,6 +60,29 @@ class _PasienAllHariIniPageState extends State<PasienAllHariIniPage> {
       _onlyUnverified = false;
       _onlyKonsul = false;
     });
+  }
+
+  // Fungsi untuk copy nomor registrasi ke clipboard
+  Future<void> _copyRegId(String regId, String namaPasien) async {
+    await Clipboard.setData(ClipboardData(text: regId));
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No. Registrasi $regId ($namaPasien) telah disalin!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: 'OK',
+            textColor: Colors.white,
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            },
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> loadPasienAllHariIni() async {
@@ -357,10 +381,35 @@ class _PasienAllHariIniPageState extends State<PasienAllHariIniPage> {
                                           Text(p['namaDPJP']),
                                         ],
                                       ),
+                                      const SizedBox(height: 4),
+                                      // Indikator bahwa item bisa di-tap untuk copy
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.content_copy,
+                                            size: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            "Tap untuk copy no. registrasi",
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.grey[600],
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                   trailing: _statusChip(p),
                                   isThreeLine: true,
+                                  // Tambahkan onTap untuk copy registrasi ID
+                                  onTap: () => _copyRegId(
+                                    p['registrasiId'].toString(),
+                                    p['namaPasien'],
+                                  ),
                                 ),
                               );
                             },

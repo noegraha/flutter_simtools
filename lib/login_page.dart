@@ -8,7 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final AppThemeMode appThemeMode;
+  final void Function(AppThemeMode) onChangeThemeMode;
+
+  const LoginPage({
+    super.key,
+    required this.appThemeMode,
+    required this.onChangeThemeMode,
+  });
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -116,8 +123,10 @@ class _LoginPageState extends State<LoginPage> {
               context,
               MaterialPageRoute(
                 builder: (_) => HomePage(
-                  appThemeMode: AppThemeMode.system,
-                  onChangeThemeMode: (val) {},
+                  appThemeMode:
+                      widget.appThemeMode, // Gunakan tema dari parameter
+                  onChangeThemeMode:
+                      widget.onChangeThemeMode, // Pass callback tema
                 ),
               ),
             );
@@ -149,6 +158,70 @@ class _LoginPageState extends State<LoginPage> {
             filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
             child: Container(color: Colors.black.withOpacity(0.2)),
           ),
+
+          // Tombol tema di pojok kanan atas
+          Positioned(
+            top: 50,
+            right: 20,
+            child: PopupMenuButton<AppThemeMode>(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(Icons.color_lens, color: Colors.white),
+              ),
+              tooltip: "Ganti Tema",
+              initialValue: widget.appThemeMode,
+              onSelected: widget.onChangeThemeMode,
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: AppThemeMode.system,
+                  child: Row(
+                    children: [
+                      const Icon(Icons.phone_android),
+                      const SizedBox(width: 8),
+                      const Text("Ikuti Sistem"),
+                      if (widget.appThemeMode == AppThemeMode.system)
+                        const Spacer(),
+                      if (widget.appThemeMode == AppThemeMode.system)
+                        const Icon(Icons.check, size: 18, color: Colors.blue),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: AppThemeMode.light,
+                  child: Row(
+                    children: [
+                      Icon(Icons.wb_sunny, color: Colors.amber[700]),
+                      const SizedBox(width: 8),
+                      const Text("Terang"),
+                      if (widget.appThemeMode == AppThemeMode.light)
+                        const Spacer(),
+                      if (widget.appThemeMode == AppThemeMode.light)
+                        const Icon(Icons.check, size: 18, color: Colors.blue),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: AppThemeMode.dark,
+                  child: Row(
+                    children: [
+                      Icon(Icons.nights_stay, color: Colors.blueGrey[800]),
+                      const SizedBox(width: 8),
+                      const Text("Gelap"),
+                      if (widget.appThemeMode == AppThemeMode.dark)
+                        const Spacer(),
+                      if (widget.appThemeMode == AppThemeMode.dark)
+                        const Icon(Icons.check, size: 18, color: Colors.blue),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           // Card login
           Center(
             child: Card(
@@ -206,6 +279,7 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: _loading ? null : _signIn,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

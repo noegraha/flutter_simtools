@@ -273,7 +273,12 @@ class _HomePageState extends State<HomePage> {
                       // Kembali ke LoginPage dan hapus seluruh navigation stack
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                        MaterialPageRoute(
+                          builder: (_) => LoginPage(
+                            appThemeMode: widget.appThemeMode,
+                            onChangeThemeMode: widget.onChangeThemeMode,
+                          ),
+                        ),
                         (route) => false,
                       );
                     },

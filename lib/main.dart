@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'home_page.dart';
+import 'login_page.dart'; // Import LoginPage
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,20 +34,49 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _setAppThemeMode(AppThemeMode mode) {
+    print('🎨 Changing theme from $_appThemeMode to $mode');
     setState(() {
       _appThemeMode = mode;
     });
+    print('✅ Theme changed to $_appThemeMode, ThemeMode: $_themeMode');
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SIM Tools',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.light,
+        ),
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: Colors.grey[900],
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[900],
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+      ),
       themeMode: _themeMode,
       debugShowCheckedModeBanner: false,
-      home: HomePage(
+      // App akan selalu masuk ke LoginPage terlebih dahulu
+      home: LoginPage(
         appThemeMode: _appThemeMode,
         onChangeThemeMode: _setAppThemeMode,
       ),
