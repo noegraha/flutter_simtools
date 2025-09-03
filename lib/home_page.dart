@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_simtools/batal_alih_rawat_page.dart';
 import 'package:flutter_simtools/catatan_medis_double_page.dart';
+import 'package:flutter_simtools/list_ip_page.dart';
 import 'package:flutter_simtools/pasien_all_hari_ini_page.dart';
 import 'main.dart'; // Pastikan ini import AppThemeMode
 import 'login_page.dart'; // Import LoginPage sesuai path Anda
@@ -25,15 +26,16 @@ final menuList = [
         'widget': const CatatanMedisDoublePage(),
       },
       {'label': 'Pasien All Hari Ini', 'widget': const PasienAllHariIniPage()},
-      {'label': 'Sinkron Master ICD', 'widget': menuPage('Sinkron Master ICD')},
-      {'label': 'Balik Ruang', 'widget': menuPage('Balik Ruang')},
-      {'label': 'List Antal', 'widget': menuPage('List Antal')},
-      {'label': 'Billing', 'widget': menuPage('Billing')},
-      {'label': 'Telemedicine', 'widget': menuPage('Telemedicine')},
-      {
-        'label': 'Master Penunjang Lain',
-        'widget': menuPage('Master Penunjang Lain'),
-      },
+      // {'label': 'Sinkron Master ICD', 'widget': menuPage('Sinkron Master ICD')},
+      // {'label': 'Balik Ruang', 'widget': menuPage('Balik Ruang')},
+      // {'label': 'List Antal', 'widget': menuPage('List Antal')},
+      // {'label': 'Billing', 'widget': menuPage('Billing')},
+      // {'label': 'Telemedicine', 'widget': menuPage('Telemedicine')},
+      // {
+      //   'label': 'Master Penunjang Lain',
+      //   'widget': menuPage('Master Penunjang Lain'),
+      // },
+      {'label': 'List IP Tools', 'widget': const ListIPPage()},
     ],
   },
   {
