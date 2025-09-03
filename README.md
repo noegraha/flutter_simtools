@@ -1,16 +1,45 @@
 # flutter_simtools
 
-A new Flutter project.
+[![Flutter](https://img.shields.io/badge/Flutter-Framework-blue)](https://flutter.dev)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-## Getting Started
+## 📌 Deskripsi
+`flutter_simtools` adalah proyek Flutter yang dikembangkan untuk menyediakan **tools simulasi dan utilitas** yang dapat digunakan dalam pengembangan aplikasi.  
+Proyek ini masih dalam tahap awal, dan akan terus dikembangkan sesuai kebutuhan.
 
-This project is a starting point for a Flutter application.
+## 🚀 Fitur Utama (rencana)
+- 🔧 Modul tools simulasi
+- 📊 Visualisasi data sederhana
+- 📱 Support Android & iOS
+- 🌐 Dukungan web (jika diperlukan)
 
-A few resources to get you started if this is your first Flutter project:
+## 📂 Struktur Proyek
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+flutter_simtools/
+├── lib/                # Source code utama
+├── test/               # Unit test
+├── android/            # Konfigurasi Android
+├── ios/                # Konfigurasi iOS
+└── pubspec.yaml        # Konfigurasi dependencies
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ⚡️ Instalasi & Menjalankan
+Pastikan sudah menginstall [Flutter SDK](https://docs.flutter.dev/get-started/install).
+
+# Clone repositori
+git clone https://github.com/noegraha/flutter_simtools.git
+cd flutter_simtools
+
+# Install dependencies
+flutter pub get
+
+# Menjalankan aplikasi
+flutter run
+
+## 🧪 Testing
+
+Untuk menjalankan unit test:
+flutter test
+
+🤝 Kontribusi
+
+Kontribusi sangat terbuka! Silakan buat pull request atau buka issue jika menemukan bug / saran fitur.
